@@ -5,33 +5,34 @@
 #include <SFML/Graphics.hpp>
 
 int main() {
+    // load font
     sf::Font font;
-    if (!font.loadFromFile("fonts/Cantarell.ttf")) {
-        return 1;
-    }
+    if (!font.loadFromFile("fonts/Cantarell.ttf")) return 1;
     Utils::setFont(font);
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Think Fast");
-    Utils::Screen* screen;
-    screen = new MainMenu(window);
+    // create the window
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Think Fast", sf::Style::Titlebar | sf::Style::Close);
+    Utils::Screen* screen = new Menu(window);
     // run the program as long as the window is open
     while (window.isOpen()) {
-        // check all the window's events that were triggered since the last iteration of the loop
+        // check all events since last iteration
         sf::Event event;
         while (window.pollEvent(event)) {
             switch (event.type) {
                 case sf::Event::Closed:
+                    // quit on close
                     window.close();
                     break;
                 case sf::Event::KeyPressed:
+                    // pass keypress to current screen
                     screen->keypress(event.key);
                     break;
                 default:
                     break;
             }
         }
-        // clear the window with black color
+        // start all black
         window.clear(sf::Color::Black);
-        // draw stuff
+        // draw from screen
         screen->draw();
         // end the current frame
         window.display();

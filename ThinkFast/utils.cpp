@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 
+Utils::Screen::Screen(sf::RenderWindow& newWindow) : window(newWindow) {}
+
 sf::Font font;
 
 // initalise font
@@ -18,8 +20,9 @@ void Utils::makeText(sf::Text& base, const char* str, int size, sf::Color colour
     base.setStyle(style);
 }
 
-// take a base Text element, centre horizontally
-void Utils::horizCentreText(sf::Text& base) {
+// take a base Text element, centre horizontally and/or vertically
+void Utils::centreText(sf::Text& base, bool horiz, bool vert) {
     sf::FloatRect bounds = base.getGlobalBounds();
-    base.setPosition(400 - (bounds.width / 2), bounds.top);
+    if (horiz) base.setPosition(400 - (bounds.width / 2), bounds.top);
+    if (vert) base.setPosition(bounds.left, 300 - (bounds.height / 2));
 }
