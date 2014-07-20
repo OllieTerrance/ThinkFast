@@ -11,7 +11,7 @@ int main() {
     Utils::setFont(font);
     // create the window
     sf::RenderWindow window(sf::VideoMode(800, 600), "Think Fast", sf::Style::Titlebar | sf::Style::Close);
-    Utils::Screen* screen = new Menu(window);
+    Manager manager(window);
     // run the program as long as the window is open
     while (window.isOpen()) {
         // check all events since last iteration
@@ -24,7 +24,7 @@ int main() {
                     break;
                 case sf::Event::KeyPressed:
                     // pass keypress to current screen
-                    screen->keypress(event.key);
+                    manager.getScreen().keypress(event.key);
                     break;
                 default:
                     break;
@@ -33,7 +33,7 @@ int main() {
         // start all black
         window.clear(sf::Color::Black);
         // draw from screen
-        screen->draw();
+        manager.getScreen().draw();
         // end the current frame
         window.display();
     }

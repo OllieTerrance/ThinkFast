@@ -2,7 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 
-Utils::Screen::Screen(sf::RenderWindow& newWindow) : window(newWindow) {}
+Utils::Screen::Screen() {}
+Utils::Screen::~Screen() {}
 
 sf::Font font;
 
@@ -24,5 +25,8 @@ void Utils::makeText(sf::Text& base, const char* str, int size, sf::Color colour
 void Utils::centreText(sf::Text& base, bool horiz, bool vert) {
     sf::FloatRect bounds = base.getGlobalBounds();
     if (horiz) base.setPosition(400 - (bounds.width / 2), bounds.top);
-    if (vert) base.setPosition(bounds.left, 300 - (bounds.height / 2));
+    if (vert) {
+        if (horiz) bounds = base.getGlobalBounds();
+        base.setPosition(bounds.left, 300 - (bounds.height / 2));
+    }
 }
