@@ -1,17 +1,17 @@
 #include "header.h"
 
-#include <iostream>
-
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 
 int main() {
-    // load font
-    sf::Font font;
-    if (!font.loadFromFile("fonts/Cantarell.ttf")) return 1;
-    Utils::setFont(font);
-    // create the window
+    // create the window and manager
     sf::RenderWindow window(sf::VideoMode(800, 600), "Think Fast", sf::Style::Titlebar | sf::Style::Close);
-    Manager manager(window);
+    Manager* manager;
+    try {
+        manager = new Manager(window);
+    } catch (int err) {
+        return err;
+    }
     // run the program as long as the window is open
     while (window.isOpen()) {
         // check all events since last iteration
@@ -24,7 +24,7 @@ int main() {
                     break;
                 case sf::Event::KeyPressed:
                     // pass keypress to current screen
-                    manager.getScreen().keypress(event.key);
+                    manager->getScreen().keypress(event.key);
                     break;
                 default:
                     break;
@@ -33,7 +33,7 @@ int main() {
         // start all black
         window.clear(sf::Color::Black);
         // draw from screen
-        manager.getScreen().draw();
+        manager->getScreen().draw();
         // end the current frame
         window.display();
     }

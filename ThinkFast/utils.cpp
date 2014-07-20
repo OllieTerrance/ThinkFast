@@ -3,17 +3,11 @@
 #include <SFML/Graphics.hpp>
 
 Utils::Screen::Screen() {}
+
 Utils::Screen::~Screen() {}
 
-sf::Font font;
-
-// initalise font
-void Utils::setFont(sf::Font& newFont) {
-    font = newFont;
-}
-
 // take a base Text element, set font/text/size/style
-void Utils::makeText(sf::Text& base, const char* str, int size, sf::Color colour, int style) {
+void Utils::makeText(sf::Text& base, sf::Font& font, const char* str, int size, sf::Color colour, int style) {
     base.setFont(font);
     base.setString(str);
     base.setCharacterSize(size);
