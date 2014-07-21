@@ -10,14 +10,15 @@ public:
     public:
         Screen();
         virtual ~Screen();
-        virtual void init() = 0;
-        virtual void draw() = 0;
-        virtual void keypress(sf::Event::KeyEvent& key) = 0;
+        virtual void init();
+        virtual void draw();
+        virtual void keypress(sf::Event::KeyEvent& key);
     };
-    // text-related helpers
-    static void setFont(sf::Font& newFont);
+    // text-related
     static void makeText(sf::Text& base, sf::Font& font, const char* str, int size, sf::Color colour, int style);
     static void centreText(sf::Text& base, bool horiz, bool vert);
+    // mathematical
+    static int mod(int a, int b);
 };
 
 // manager allows switching between screens
@@ -52,6 +53,8 @@ public:
 // actual gameplay screen
 class Game : public Utils::Screen {
     Manager& manager;
+    int lives;
+    int score;
     int countdown;
     sf::Clock clock;
     int state;

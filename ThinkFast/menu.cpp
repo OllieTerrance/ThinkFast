@@ -43,21 +43,21 @@ void Menu::keypress(sf::Event::KeyEvent& key) {
     switch (key.code) {
         case sf::Keyboard::Key::Left:
             if (selIndex == 1) {
-                players = (players - 1) % 4;
+                players = Utils::mod((players - 1), 4);
                 if (players == 0) players = 4;
             }
             break;
         case sf::Keyboard::Key::Right:
             if (selIndex == 1) {
-                players = (players + 1) % 4;
+                players = Utils::mod((players + 1), 4);
                 if (players == 0) players = 4;
             }
             break;
         case sf::Keyboard::Key::Up:
-            selIndex = (selIndex - 1) % 3;
+            selIndex = Utils::mod((selIndex - 1), 3);
             break;
         case sf::Keyboard::Key::Down:
-            selIndex = (selIndex + 1) % 3;
+            selIndex = Utils::mod((selIndex + 1), 3);
             break;
         case sf::Keyboard::Key::Return:
             switch (selIndex) {

@@ -10,6 +10,8 @@ Game::Game(Manager& newManager) : manager(newManager) {}
 Game::~Game() {}
 
 void Game::init() {
+    lives = 3;
+    score = 0;
     countdown = 5;
     state = 0;
 }
@@ -42,9 +44,9 @@ void Game::draw() {
             Utils::centreText(instruction, true, true);
             manager.getWindow().draw(instruction);
         }
-        sf::RectangleShape progressBar(sf::Vector2f(800 * (1 - (time / 2000)), 20));
+        sf::RectangleShape progressBar(sf::Vector2f(800 * (1 - (time / 2000.0)), 20));
         progressBar.setPosition(0, 580);
-        progressBar.setFillColor(sf::Color::Yellow);
+        progressBar.setFillColor(sf::Color(32, 32, 32));
         manager.getWindow().draw(progressBar);
     // game finished
     } else if (clock.getElapsedTime().asMilliseconds() < 3000) {
@@ -57,7 +59,27 @@ void Game::draw() {
         Utils::centreText(result, true, true);
         manager.getWindow().draw(result);
     // reset for next game
-    } else init();
+    } else {
+        if (state == 1) score++;
+        if (state == 2) lives--;
+        countdown = 5;
+        state = 0;
+        draw();
+    }
+    // always shown
+    sf::Text livesText;
+    std::ostringstream livesStr;
+    livesStr << "Lives: " << lives;
+    Utils::makeText(livesText, manager.getFont(), livesStr.str().c_str(), 20, sf::Color(128, 128, 128), 0);
+    livesText.setPosition(15, 15);
+    manager.getWindow().draw(livesText);
+    sf::Text scoreText;
+    std::ostringstream scoreStr;
+    scoreStr << "Score: " << score;
+    Utils::makeText(scoreText, manager.getFont(), scoreStr.str().c_str(), 20, sf::Color(128, 128, 128), 0);
+    sf::FloatRect scoreBounds = scoreText.getGlobalBounds();
+    scoreText.setPosition(785 - scoreBounds.width, 15);
+    manager.getWindow().draw(scoreText);
 }
 
 void Game::keypress(sf::Event::KeyEvent& key) {
