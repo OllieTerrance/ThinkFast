@@ -17,19 +17,29 @@ void Game::init() {
 }
 
 void Game::draw() {
-    // initial countdown from 4
+    // countdown steps
     if (countdown == 5 || (countdown > 0 && clock.getElapsedTime().asMilliseconds() >= 500)) {
         countdown--;
         clock.restart();
     }
-    // print countdown
+    // print countdown or show game over
     if (countdown > 0) {
-        sf::Text count;
-        std::ostringstream countStr;
-        countStr << countdown << "...";
-        Utils::makeText(count, manager.getFont(), countStr.str().c_str(), 32, sf::Color::Yellow, sf::Text::Bold);
-        Utils::centreText(count, true, true);
-        manager.getWindow().draw(count);
+        if (lives > 0) {
+            sf::Text countText;
+            std::ostringstream countStr;
+            countStr << countdown << "...";
+            Utils::makeText(countText, manager.getFont(), countStr.str().c_str(), 32, sf::Color::Yellow, sf::Text::Bold);
+            Utils::centreText(countText, true, true);
+            manager.getWindow().draw(countText);
+        } else {
+            sf::Text gameOver;
+            Utils::makeText(gameOver, manager.getFont(), "Game over!", 40, sf::Color::Red, sf::Text::Bold);
+            Utils::centreText(gameOver, true, true);
+            manager.getWindow().draw(gameOver);
+        }
+    // game over, return to menu
+    } else if (lives == 0) {
+        manager.setCurrent(0);
     // game in progress
     } else if (clock.getElapsedTime().asMilliseconds() < 2000) {
         if (state == 1) {
