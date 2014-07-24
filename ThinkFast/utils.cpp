@@ -10,6 +10,13 @@ void Utils::Screen::init() {}
 void Utils::Screen::draw() {}
 void Utils::Screen::keypress(sf::Event::KeyEvent& key) {}
 
+Utils::Game::Game() {}
+
+Utils::Game::~Game() {}
+
+void Utils::Game::draw() {}
+void Utils::Game::keypress(sf::Event::KeyEvent& key) {}
+
 // take a base Text element, set font/text/size/style
 void Utils::makeText(sf::Text& base, sf::Font& font, const char* str, int size, sf::Color colour, int style) {
     base.setFont(font);

@@ -11,7 +11,17 @@ public:
         Screen();
         virtual ~Screen();
         virtual void init();
-        virtual void draw();
+        virtual void draw(sf::RenderWindow& window);
+        virtual void keypress(sf::Event::KeyEvent& key);
+    };
+    // game class abstracts individual mini-games
+    class Game {
+        enum State {InProgress, Win, Lose};
+        State current;
+    public:
+        Game();
+        virtual ~Game();
+        virtual void draw(sf::RenderWindow& window);
         virtual void keypress(sf::Event::KeyEvent& key);
     };
     // text-related
@@ -46,22 +56,37 @@ public:
     Menu(Manager& newManager);
     ~Menu();
     void init();
-    void draw();
+    void draw(sf::RenderWindow& window);
     void keypress(sf::Event::KeyEvent& key);
 };
 
 // actual gameplay screen
-class Game : public Utils::Screen {
+class Play : public Utils::Screen {
     Manager& manager;
     int lives;
     int score;
     int countdown;
     sf::Clock clock;
-    int state;
+    Utils::Game* game;
+    enum State {InProgress, Win, Lose};
+    State current;
 public:
-    Game(Manager& newManager);
-    ~Game();
+    Play(Manager& newManager);
+    ~Play();
     void init();
-    void draw();
+    void draw(sf::RenderWindow& window);
     void keypress(sf::Event::KeyEvent& key);
+    void win();
+    void lose();
 };
+
+namespace Games {
+    class PressSpace : public Utils::Game {
+        Play& parent;
+    public:
+        PressSpace(Play& newParent);
+        ~PressSpace();
+        void draw(sf::RenderWindow& window);
+        void keypress(sf::Event::KeyEvent& key);
+    };
+}

@@ -3,7 +3,7 @@
 Manager::Manager(sf::RenderWindow& newWindow) : window(newWindow) {
 	// create screens
 	screens[0] = new Menu(*this);
-	screens[1] = new Game(*this);
+	screens[1] = new Play(*this);
 	current = 0;
 	// load external resources
     if (!font.loadFromFile("fonts/Cantarell.ttf")) throw -1;

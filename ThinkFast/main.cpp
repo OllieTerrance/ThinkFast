@@ -33,7 +33,7 @@ int main() {
         // start all black
         window.clear(sf::Color::Black);
         // draw from screen
-        manager->getScreen().draw();
+        manager->getScreen().draw(window);
         // end the current frame
         window.display();
     }
