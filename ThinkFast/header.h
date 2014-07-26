@@ -21,6 +21,7 @@ namespace Utils {
         virtual ~Game();
         virtual void draw(sf::RenderWindow& window);
         virtual void keypress(sf::Event::KeyEvent& key);
+        virtual char* getPrompt();
     };
     // text-related
     void makeText(sf::Text& base, sf::Font& font, const char* str, int size, sf::Color colour, int style);
@@ -70,27 +71,34 @@ class Play : public Utils::Screen {
     int countdown;
     sf::Clock clock;
     Utils::Game* game;
-    enum State {InProgress, Win, Lose};
-    State current;
 public:
     Play(Manager& newManager);
     ~Play();
+    enum State {InProgress, Win, Lose};
     void init();
     void draw(sf::RenderWindow& window);
     void keypress(sf::Event::KeyEvent& key);
     sf::Time getTime();
     void win();
     void lose();
+private:
+    State current;
 };
 
 namespace Games {
-    class PressSpace : public Utils::Game {
+    class PressButton : public Utils::Game {
         Play& parent;
         sf::Texture bg;
+        int index;
+        int widths[3] = {110, 89, 56};
+        int heights[3] = {55, 43, 36};
     public:
-        PressSpace(Play& newParent);
-        ~PressSpace();
+        PressButton(Play& newParent);
+        ~PressButton();
+        enum Button {Space, Enter, Up};
+        const char* images[3] = {"space", "enter", "up"};
         void draw(sf::RenderWindow& window);
         void keypress(sf::Event::KeyEvent& key);
+        char* getPrompt();
     };
 }

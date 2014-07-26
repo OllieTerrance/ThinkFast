@@ -6,9 +6,7 @@
 #include <SFML/Window.hpp>
 
 Play::Play(Manager& newManager) : manager(newManager) {
-    if (!heart.loadFromFile("images/heart.png")) {
-        printf("Failed to load heart.png.");
-    }
+    if (!heart.loadFromFile("images/heart.png")) throw -1;
 }
 
 Play::~Play() {}
@@ -18,7 +16,7 @@ void Play::init() {
     score = 0;
     countdown = 5;
     current = InProgress;
-    game = new Games::PressSpace(*this);
+    game = new Games::PressButton(*this);
 }
 
 void Play::draw(sf::RenderWindow& window) {
@@ -53,9 +51,9 @@ void Play::draw(sf::RenderWindow& window) {
         if (time <= 750) {
             sf::Text infoText;
             sf::Text infoOutlines[4];
-            Utils::makeText(infoText, infoOutlines, manager.getFont(), "Press Space!", 40, sf::Color::White, sf::Color::Black, sf::Text::Bold);
+            Utils::makeText(infoText, infoOutlines, manager.getFont(), game->getPrompt(), 40, sf::Color::White, sf::Color::Black, sf::Text::Bold);
             Utils::centreText(infoText, true, true);
-            Utils::moveOutlineText(infoText, infoOutlines, 9);
+            Utils::moveOutlineText(infoText, infoOutlines, 8);
             for (int i = 0; i < 4; i++) {
                 window.draw(infoOutlines[i]);
             }
@@ -87,6 +85,7 @@ void Play::draw(sf::RenderWindow& window) {
         if (current == Lose) lives--;
         countdown = 5;
         current = InProgress;
+        game = new Games::PressButton(*this);
         draw(window);
     }
     // always shown
