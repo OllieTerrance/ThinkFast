@@ -2,9 +2,7 @@
 #include <SFML/Window.hpp>
 
 // general helper methods
-class Utils {
-public:
-    static sf::Font font;
+namespace Utils {
     // screen class provides abstraction over "sections" of the game
     class Screen {
     public:
@@ -25,11 +23,14 @@ public:
         virtual void keypress(sf::Event::KeyEvent& key);
     };
     // text-related
-    static void makeText(sf::Text& base, sf::Font& font, const char* str, int size, sf::Color colour, int style);
-    static void centreText(sf::Text& base, bool horiz, bool vert);
+    void makeText(sf::Text& base, sf::Font& font, const char* str, int size, sf::Color colour, int style);
+    void makeText(sf::Text& base, sf::Text* outlines, sf::Font& font, const char* str, int size,
+                  sf::Color colour, sf::Color outlineColour, int style);
+    void centreText(sf::Text& base, bool horiz, bool vert);
+    void moveOutlineText(sf::Text& base, sf::Text* outlines, int shift);
     // mathematical
-    static int mod(int a, int b);
-};
+    int mod(int a, int b);
+}
 
 // manager allows switching between screens
 class Manager {
@@ -64,6 +65,7 @@ public:
 class Play : public Utils::Screen {
     Manager& manager;
     int lives;
+    sf::Texture heart;
     int score;
     int countdown;
     sf::Clock clock;
@@ -76,6 +78,7 @@ public:
     void init();
     void draw(sf::RenderWindow& window);
     void keypress(sf::Event::KeyEvent& key);
+    sf::Time getTime();
     void win();
     void lose();
 };
@@ -83,6 +86,7 @@ public:
 namespace Games {
     class PressSpace : public Utils::Game {
         Play& parent;
+        sf::Texture bg;
     public:
         PressSpace(Play& newParent);
         ~PressSpace();

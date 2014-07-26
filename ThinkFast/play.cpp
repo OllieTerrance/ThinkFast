@@ -5,7 +5,11 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-Play::Play(Manager& newManager) : manager(newManager) {}
+Play::Play(Manager& newManager) : manager(newManager) {
+    if (!heart.loadFromFile("images/heart.png")) {
+        printf("Failed to load heart.png.");
+    }
+}
 
 Play::~Play() {}
 
@@ -43,21 +47,30 @@ void Play::draw(sf::RenderWindow& window) {
         manager.setCurrent(0);
     // game in progress
     } else if (clock.getElapsedTime().asMilliseconds() < 2000) {
-        if (current == Win) window.clear(sf::Color::Green);
-        if (current == Lose) window.clear(sf::Color::Red);
-        int time = clock.getElapsedTime().asMilliseconds();
-        if (time <= 750) {
-            sf::Text instruction;
-            Utils::makeText(instruction, manager.getFont(), "Press Space!", 40, sf::Color::White, sf::Text::Bold);
-            Utils::centreText(instruction, true, true);
-            window.draw(instruction);
-        }
-        sf::RectangleShape progressBar(sf::Vector2f(800 * (1 - (time / 2000.0)), 20));
-        progressBar.setPosition(0, 580);
-        progressBar.setFillColor(sf::Color(32, 32, 32));
-        window.draw(progressBar);
         // draw game-specific features
         game->draw(window);
+        int time = clock.getElapsedTime().asMilliseconds();
+        if (time <= 750) {
+            sf::Text infoText;
+            sf::Text infoOutlines[4];
+            Utils::makeText(infoText, infoOutlines, manager.getFont(), "Press Space!", 40, sf::Color::White, sf::Color::Black, sf::Text::Bold);
+            Utils::centreText(infoText, true, true);
+            Utils::moveOutlineText(infoText, infoOutlines, 9);
+            for (int i = 0; i < 4; i++) {
+                window.draw(infoOutlines[i]);
+            }
+            window.draw(infoText);
+        }
+        sf::RectangleShape progBar1(sf::Vector2f(800 * (1 - (time / 2000.0)), 20));
+        sf::RectangleShape progBar2(sf::Vector2f(800 * (time / 2000.0), 20));
+        progBar1.setPosition(0, 580);
+        progBar2.setPosition(800 * (1 - (time / 2000.0)), 580);
+        sf::Color bar1(current == Win ? sf::Color::Green : (current == Lose ? sf::Color::Red : sf::Color(96, 96, 96)));
+        sf::Color bar2(current == Win ? sf::Color(0, 64, 0) : (current == Lose ? sf::Color(64, 0, 0) : sf::Color(24, 24, 24)));
+        progBar1.setFillColor(bar1);
+        progBar2.setFillColor(bar2);
+        window.draw(progBar1);
+        window.draw(progBar2);
     // game finished
     } else if (clock.getElapsedTime().asMilliseconds() < 3000) {
         // if neither won nor lost, set to lose
@@ -77,18 +90,33 @@ void Play::draw(sf::RenderWindow& window) {
         draw(window);
     }
     // always shown
-    sf::Text livesText;
-    std::ostringstream livesStr;
-    livesStr << "Lives: " << lives;
-    Utils::makeText(livesText, manager.getFont(), livesStr.str().c_str(), 20, sf::Color(128, 128, 128), 0);
-    livesText.setPosition(15, 15);
-    window.draw(livesText);
+    sf::Sprite hearts[3];
+    if (lives >= 1) {
+        hearts[0].setTexture(heart);
+        hearts[0].setPosition(2, 2);
+        window.draw(hearts[0]);
+        if (lives >= 2) {
+            hearts[1].setTexture(heart);
+            hearts[1].setPosition(17, 2);
+            window.draw(hearts[1]);
+            if (lives >= 3) {
+                hearts[2].setTexture(heart);
+                hearts[2].setPosition(32, 2);
+                window.draw(hearts[2]);
+            }
+        }
+    }
     sf::Text scoreText;
+    sf::Text scoreOutlines[4];
     std::ostringstream scoreStr;
-    scoreStr << "Score: " << score;
-    Utils::makeText(scoreText, manager.getFont(), scoreStr.str().c_str(), 20, sf::Color(128, 128, 128), 0);
+    scoreStr << score;
+    Utils::makeText(scoreText, scoreOutlines, manager.getFont(), scoreStr.str().c_str(), 28, sf::Color::White, sf::Color::Black, sf::Text::Bold);
     sf::FloatRect scoreBounds = scoreText.getGlobalBounds();
-    scoreText.setPosition(785 - scoreBounds.width, 15);
+    scoreText.setPosition(790 - scoreBounds.width, 5);
+    Utils::moveOutlineText(scoreText, scoreOutlines, 6);
+    for (int i = 0; i < 4; i++) {
+        window.draw(scoreOutlines[i]);
+    }
     window.draw(scoreText);
 }
 
@@ -103,6 +131,10 @@ void Play::keypress(sf::Event::KeyEvent& key) {
             game->keypress(key);
             break;
     }
+}
+
+sf::Time Play::getTime() {
+    return clock.getElapsedTime();
 }
 
 void Play::win() {
