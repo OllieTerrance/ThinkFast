@@ -6,7 +6,7 @@
 #include <SFML/Window.hpp>
 
 Play::Play(Manager& newManager) : manager(newManager) {
-    if (!heart.loadFromFile("images/heart.png")) throw -1;
+    if (!heart.loadFromFile("images/heart.png")) throw ERR_ASSET;
 }
 
 Play::~Play() {}
@@ -31,7 +31,7 @@ void Play::draw(sf::RenderWindow& window) {
             sf::Text countText;
             std::ostringstream countStr;
             countStr << countdown << "...";
-            Utils::makeText(countText, manager.getFont(), countStr.str().c_str(), 32, sf::Color::Yellow, sf::Text::Bold);
+            Utils::makeText(countText, manager.getFont(), countStr.str(), 32, sf::Color::Yellow, sf::Text::Bold);
             Utils::centreText(countText, true, true);
             window.draw(countText);
         } else {

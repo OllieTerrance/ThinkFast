@@ -1,8 +1,12 @@
+#include <iostream>
+
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
 // constants and macros
-#define MAXPLAYERS 8
+#define ERR_ASSET 2
+#define MAX_PLAYERS 8
 #define MOD(a, b) (((a) % (b)) + (b)) % (b)
 
 // general helper methods
@@ -27,14 +31,16 @@ namespace Utils {
         virtual void draw(sf::RenderWindow& window);
         virtual void keypress(sf::Event::KeyEvent& key, bool on);
         virtual void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
-        virtual const char* getPrompt();
+        virtual std::string getPrompt();
     };
     // text-related
-    void makeText(sf::Text& base, sf::Font& font, const char* str, int size, sf::Color colour, int style);
-    void makeText(sf::Text& base, sf::Text* outlines, sf::Font& font, const char* str, int size,
+    void makeText(sf::Text& base, sf::Font& font, std::string str, int size, sf::Color colour, int style);
+    void makeText(sf::Text& base, sf::Text* outlines, sf::Font& font, std::string str, int size,
                   sf::Color colour, sf::Color outlineColour, int style);
     void centreText(sf::Text& base, bool horiz, bool vert);
     void moveOutlineText(sf::Text& base, sf::Text* outlines, int shift);
+    // sound-related
+    void playSound(sf::SoundBuffer& buffer, sf::Sound& sound, std::string path);
 }
 
 // manager allows switching between screens
@@ -70,7 +76,7 @@ public:
 // control test screen
 class Controls : public Utils::Screen {
     Manager& manager;
-    bool pressed[MAXPLAYERS];
+    bool pressed[MAX_PLAYERS];
 public:
     Controls(Manager& newManager);
     ~Controls();
@@ -115,10 +121,10 @@ namespace Games {
         PressButton(Play& newParent);
         ~PressButton();
         enum Button {Space, Enter, Up};
-        const char* images[3] = {"space", "enter", "up"};
+        const std::string images[3] = {"space", "enter", "up"};
         void draw(sf::RenderWindow& window);
         void keypress(sf::Event::KeyEvent& key, bool on);
         void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
-        const char* getPrompt();
+        std::string getPrompt();
     };
 }

@@ -10,7 +10,7 @@ Controls::Controls(Manager& newManager) : manager(newManager) {}
 Controls::~Controls() {}
 
 void Controls::init() {
-    for (int i = 0; i < MAXPLAYERS; i++) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
         pressed[i] = false;
     }
 }
@@ -23,12 +23,12 @@ void Controls::draw(sf::RenderWindow& window) {
     Utils::centreText(backPrompt, true, false);
     window.draw(backPrompt);
     // joystick connection status
-    for (int i = 0; i < MAXPLAYERS; i++) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
         sf::Text joy;
         std::ostringstream joyStr;
         joyStr << (i + 1);
         sf::Color colour = sf::Joystick::isConnected(i) ? (pressed[i] ? sf::Color::Red : sf::Color::Green) : sf::Color(64, 64, 64);
-        Utils::makeText(joy, manager.getFont(), joyStr.str().c_str(), 48, colour, sf::Text::Bold);
+        Utils::makeText(joy, manager.getFont(), joyStr.str(), 48, colour, sf::Text::Bold);
         joy.setPosition(170 + (60 * i), 340);
         window.draw(joy);
     }

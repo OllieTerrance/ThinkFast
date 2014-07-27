@@ -7,7 +7,7 @@ Manager::Manager(sf::RenderWindow& newWindow) : window(newWindow) {
 	screens[2] = new Play(*this);
 	current = 0;
 	// load external resources
-    if (!font.loadFromFile("fonts/Cantarell.ttf")) throw -1;
+    if (!font.loadFromFile("fonts/Cantarell.ttf")) throw ERR_ASSET;
 	// init current screen
 	screens[current]->init();
 }

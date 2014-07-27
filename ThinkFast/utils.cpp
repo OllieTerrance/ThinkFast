@@ -1,5 +1,8 @@
 #include "header.h"
 
+#include <iostream>
+
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 
 Utils::Screen::Screen() {}
@@ -14,12 +17,12 @@ Utils::Game::~Game() {}
 void Utils::Game::draw(sf::RenderWindow& window) {}
 void Utils::Game::keypress(sf::Event::KeyEvent& key, bool on) {}
 void Utils::Game::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {}
-const char* Utils::Game::getPrompt() {
+std::string Utils::Game::getPrompt() {
     return "";
 }
 
 // take a base Text element, set font/text/size/style
-void Utils::makeText(sf::Text& base, sf::Font& font, const char* str, int size, sf::Color colour, int style) {
+void Utils::makeText(sf::Text& base, sf::Font& font, std::string str, int size, sf::Color colour, int style) {
     base.setFont(font);
     base.setString(str);
     base.setCharacterSize(size);
@@ -27,7 +30,7 @@ void Utils::makeText(sf::Text& base, sf::Font& font, const char* str, int size, 
     base.setStyle(style);
 }
 // take a base Text element, set font/text/size/style, create outline with multiple offset copies
-void Utils::makeText(sf::Text& base, sf::Text* outlines, sf::Font& font, const char* str, int size,
+void Utils::makeText(sf::Text& base, sf::Text* outlines, sf::Font& font, std::string str, int size,
                      sf::Color colour, sf::Color outlineColour, int style) {
     Utils::makeText(base, font, str, size, colour, style);
     for (int i = 0; i < 4; i++) {
@@ -53,4 +56,11 @@ void Utils::moveOutlineText(sf::Text& base, sf::Text* outlines, int shift) {
         int offY = i < 2 ? 2 : -2;
         outlines[i].setPosition(bounds.left + offX, bounds.top - shift + offY);
     }
+}
+
+// play a sound using the given containers
+void Utils::playSound(sf::SoundBuffer& buffer, sf::Sound& sound, std::string path) {
+    if (!buffer.loadFromFile(path)) throw ERR_ASSET;
+    sound.setBuffer(buffer);
+    sound.play();
 }

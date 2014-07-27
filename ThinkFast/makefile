@@ -1,5 +1,5 @@
 CC=g++ -O3 -std=c++11 -Wall -pedantic
-LIBS=-lsfml-graphics -lsfml-window -lsfml-system
+LIBS=-lsndfile -lsfml-audio -lsfml-graphics -lsfml-window -lsfml-system
 
 SOURCES=$(wildcard *.cpp)
 OBJECTS=$(SOURCES:.cpp=.o)

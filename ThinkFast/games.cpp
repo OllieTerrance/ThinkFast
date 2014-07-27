@@ -1,10 +1,12 @@
 #include "header.h"
 
+#include <iostream>
+
 Games::PressButton::PressButton(Play& newParent) : parent(newParent) {
     index = rand() % 3;
     if ((index == 0 && !bg.loadFromFile("images/PressButton/space.png"))
         || (index == 1 && !bg.loadFromFile("images/PressButton/enter.png"))
-        || (index == 2 && !bg.loadFromFile("images/PressButton/up.png"))) throw -1;
+        || (index == 2 && !bg.loadFromFile("images/PressButton/up.png"))) throw ERR_ASSET;
     bg.setRepeated(true);
 }
 
@@ -31,6 +33,6 @@ void Games::PressButton::keypress(sf::Event::KeyEvent& key, bool on) {
 
 void Games::PressButton::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {}
 
-const char* Games::PressButton::getPrompt() {
+std::string Games::PressButton::getPrompt() {
     return "Press the button!";
 }

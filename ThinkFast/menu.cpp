@@ -2,6 +2,7 @@
 
 #include <sstream>
 
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
@@ -29,7 +30,7 @@ void Menu::draw(sf::RenderWindow& window) {
     sf::Text opt2;
     std::ostringstream playersStr;
     playersStr << "Players: " << players;
-    Utils::makeText(opt2, manager.getFont(), playersStr.str().c_str(), 28, (selIndex == 1 ? sf::Color::Cyan : sf::Color::White), 0);
+    Utils::makeText(opt2, manager.getFont(), playersStr.str(), 28, (selIndex == 1 ? sf::Color::Cyan : sf::Color::White), 0);
     opt2.setPosition(0, 350);
     Utils::centreText(opt2, true, false);
     window.draw(opt2);
@@ -44,11 +45,11 @@ void Menu::draw(sf::RenderWindow& window) {
     Utils::centreText(opt4, true, false);
     window.draw(opt4);
     // joystick connection status
-    for (int i = 0; i < MAXPLAYERS; i++) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
         sf::Text joy;
         std::ostringstream joyStr;
         joyStr << (i + 1);
-        Utils::makeText(joy, manager.getFont(), joyStr.str().c_str(), 16, (sf::Joystick::isConnected(i) ? sf::Color::Green : sf::Color(64, 64, 64)), 0);
+        Utils::makeText(joy, manager.getFont(), joyStr.str(), 16, (sf::Joystick::isConnected(i) ? sf::Color::Green : sf::Color(64, 64, 64)), 0);
         joy.setPosition(15 + (20 * i), 565);
         window.draw(joy);
     }
@@ -56,32 +57,40 @@ void Menu::draw(sf::RenderWindow& window) {
 
 void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
     if (!on) return;
+    sf::SoundBuffer buffer;
+    sf::Sound sound;
     switch (key.code) {
         case sf::Keyboard::Key::Left:
             if (selIndex == 1) {
-                players = MOD(players - 1, MAXPLAYERS);
-                if (players == 0) players = MAXPLAYERS;
+                players = MOD(players - 1, MAX_PLAYERS);
+                if (players == 0) players = MAX_PLAYERS;
+                Utils::playSound(buffer, sound, "sound/beep2.wav");
             }
             break;
         case sf::Keyboard::Key::Right:
             if (selIndex == 1) {
-                players = MOD(players + 1, MAXPLAYERS);
-                if (players == 0) players = MAXPLAYERS;
+                players = MOD(players + 1, MAX_PLAYERS);
+                if (players == 0) players = MAX_PLAYERS;
+                Utils::playSound(buffer, sound, "sound/beep2.wav");
             }
             break;
         case sf::Keyboard::Key::Up:
             selIndex = MOD(selIndex - 1, 4);
+            Utils::playSound(buffer, sound, "sound/beep1.wav");
             break;
         case sf::Keyboard::Key::Down:
             selIndex = MOD(selIndex + 1, 4);
+            Utils::playSound(buffer, sound, "sound/beep1.wav");
             break;
         case sf::Keyboard::Key::Return:
             switch (selIndex) {
                 case 0:
                     manager.setCurrent(2);
+                    Utils::playSound(buffer, sound, "sound/beep2.wav");
                     break;
                 case 2:
                     manager.setCurrent(1);
+                    Utils::playSound(buffer, sound, "sound/beep2.wav");
                     break;
                 case 3:
                     manager.getWindow().close();
