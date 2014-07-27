@@ -15,7 +15,7 @@ void Play::init() {
     lives = 3;
     score = 0;
     countdown = 5;
-    current = InProgress;
+    current = Countdown;
     game = new Games::PressButton(*this);
 }
 
@@ -45,6 +45,7 @@ void Play::draw(sf::RenderWindow& window) {
         manager.setCurrent(0);
     // game in progress
     } else if (clock.getElapsedTime().asMilliseconds() < 2000) {
+        if (current == Countdown) current = InProgress;
         // draw game-specific features
         game->draw(window);
         int time = clock.getElapsedTime().asMilliseconds();
@@ -84,7 +85,7 @@ void Play::draw(sf::RenderWindow& window) {
         if (current == Win) score++;
         if (current == Lose) lives--;
         countdown = 5;
-        current = InProgress;
+        current = Countdown;
         game = new Games::PressButton(*this);
         draw(window);
     }
@@ -119,17 +120,16 @@ void Play::draw(sf::RenderWindow& window) {
     window.draw(scoreText);
 }
 
-void Play::keypress(sf::Event::KeyEvent& key) {
-    switch (key.code) {
-        // return to menu
-        case sf::Keyboard::Key::Escape:
-            manager.setCurrent(0);
-            break;
-        // pass remaining input to game
-        default:
-            game->keypress(key);
-            break;
-    }
+void Play::keypress(sf::Event::KeyEvent& key, bool on) {
+    // return to menu
+    if (key.code == sf::Keyboard::Key::Escape && on) manager.setCurrent(0);
+    // pass remaining input to game
+    else if (current == InProgress) game->keypress(key, on);
+}
+
+void Play::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {
+    // pass input to game
+    if (current == InProgress) game->joybutton(button, on);
 }
 
 sf::Time Play::getTime() {

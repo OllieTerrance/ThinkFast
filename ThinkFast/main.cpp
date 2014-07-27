@@ -23,8 +23,14 @@ int main() {
                     window.close();
                     break;
                 case sf::Event::KeyPressed:
+                case sf::Event::KeyReleased:
                     // pass keypress to current screen
-                    manager->getScreen().keypress(event.key);
+                    manager->getScreen().keypress(event.key, event.type == sf::Event::KeyPressed);
+                    break;
+                case sf::Event::JoystickButtonPressed:
+                case sf::Event::JoystickButtonReleased:
+                    // pass button press to current screen
+                    manager->getScreen().joybutton(event.joystickButton, event.type == sf::Event::JoystickButtonPressed);
                     break;
                 default:
                     break;

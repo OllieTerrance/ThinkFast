@@ -1,6 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
+// constants and macros
+#define MAXPLAYERS 8
+#define MOD(a, b) (((a) % (b)) + (b)) % (b)
+
 // general helper methods
 namespace Utils {
     // screen class provides abstraction over "sections" of the game
@@ -10,7 +14,8 @@ namespace Utils {
         virtual ~Screen();
         virtual void init();
         virtual void draw(sf::RenderWindow& window);
-        virtual void keypress(sf::Event::KeyEvent& key);
+        virtual void keypress(sf::Event::KeyEvent& key, bool on);
+        virtual void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
     };
     // game class abstracts individual mini-games
     class Game {
@@ -20,8 +25,9 @@ namespace Utils {
         Game();
         virtual ~Game();
         virtual void draw(sf::RenderWindow& window);
-        virtual void keypress(sf::Event::KeyEvent& key);
-        virtual char* getPrompt();
+        virtual void keypress(sf::Event::KeyEvent& key, bool on);
+        virtual void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
+        virtual const char* getPrompt();
     };
     // text-related
     void makeText(sf::Text& base, sf::Font& font, const char* str, int size, sf::Color colour, int style);
@@ -29,15 +35,13 @@ namespace Utils {
                   sf::Color colour, sf::Color outlineColour, int style);
     void centreText(sf::Text& base, bool horiz, bool vert);
     void moveOutlineText(sf::Text& base, sf::Text* outlines, int shift);
-    // mathematical
-    int mod(int a, int b);
 }
 
 // manager allows switching between screens
 class Manager {
     sf::RenderWindow& window;
     int current;
-    Utils::Screen* screens[2];
+    Utils::Screen* screens[3];
     sf::Font font;
 public:
     Manager(sf::RenderWindow& window);
@@ -59,7 +63,21 @@ public:
     ~Menu();
     void init();
     void draw(sf::RenderWindow& window);
-    void keypress(sf::Event::KeyEvent& key);
+    void keypress(sf::Event::KeyEvent& key, bool on);
+    void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
+};
+
+// control test screen
+class Controls : public Utils::Screen {
+    Manager& manager;
+    bool pressed[MAXPLAYERS];
+public:
+    Controls(Manager& newManager);
+    ~Controls();
+    void init();
+    void draw(sf::RenderWindow& window);
+    void keypress(sf::Event::KeyEvent& key, bool on);
+    void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
 };
 
 // actual gameplay screen
@@ -74,10 +92,11 @@ class Play : public Utils::Screen {
 public:
     Play(Manager& newManager);
     ~Play();
-    enum State {InProgress, Win, Lose};
+    enum State {Countdown, InProgress, Win, Lose};
     void init();
     void draw(sf::RenderWindow& window);
-    void keypress(sf::Event::KeyEvent& key);
+    void keypress(sf::Event::KeyEvent& key, bool on);
+    void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
     sf::Time getTime();
     void win();
     void lose();
@@ -98,7 +117,8 @@ namespace Games {
         enum Button {Space, Enter, Up};
         const char* images[3] = {"space", "enter", "up"};
         void draw(sf::RenderWindow& window);
-        void keypress(sf::Event::KeyEvent& key);
-        char* getPrompt();
+        void keypress(sf::Event::KeyEvent& key, bool on);
+        void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
+        const char* getPrompt();
     };
 }

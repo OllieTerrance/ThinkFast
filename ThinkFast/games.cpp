@@ -14,13 +14,14 @@ void Games::PressButton::draw(sf::RenderWindow& window) {
     sf::Sprite background;
     background.setTexture(bg);
     int time = parent.getTime().asMilliseconds();
-    int offX = Utils::mod(time / 10, widths[index]);
-    int offY = Utils::mod(time / 25, heights[index]);
+    int offX = MOD(time / 10, widths[index]);
+    int offY = MOD(time / 25, heights[index]);
     background.setTextureRect(sf::IntRect(offX - widths[index], offY - heights[index], 800 + offX, 600 + offY));
     window.draw(background);
 }
 
-void Games::PressButton::keypress(sf::Event::KeyEvent& key) {
+void Games::PressButton::keypress(sf::Event::KeyEvent& key, bool on) {
+    if (!on) return;
     Button selected = static_cast<Button>(index);
     if ((key.code == sf::Keyboard::Key::Space && selected == Space)
         || (key.code == sf::Keyboard::Key::Return && selected == Enter)
@@ -28,6 +29,8 @@ void Games::PressButton::keypress(sf::Event::KeyEvent& key) {
     else parent.lose();
 }
 
-char* Games::PressButton::getPrompt() {
+void Games::PressButton::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {}
+
+const char* Games::PressButton::getPrompt() {
     return "Press the button!";
 }
