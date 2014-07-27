@@ -57,10 +57,3 @@ void Utils::moveOutlineText(sf::Text& base, sf::Text* outlines, int shift) {
         outlines[i].setPosition(bounds.left + offX, bounds.top - shift + offY);
     }
 }
-
-// play a sound using the given containers
-void Utils::playSound(sf::SoundBuffer& buffer, sf::Sound& sound, std::string path) {
-    if (!buffer.loadFromFile(path)) throw ERR_ASSET;
-    sound.setBuffer(buffer);
-    sound.play();
-}

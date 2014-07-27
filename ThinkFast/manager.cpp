@@ -8,6 +8,11 @@ Manager::Manager(sf::RenderWindow& newWindow) : window(newWindow) {
 	current = 0;
 	// load external resources
     if (!font.loadFromFile("fonts/Cantarell.ttf")) throw ERR_ASSET;
+    if (!buffers["beep1"].loadFromFile("sound/beep1.wav")) throw ERR_ASSET;
+    if (!buffers["beep2"].loadFromFile("sound/beep2.wav")) throw ERR_ASSET;
+	for (std::map<std::string, sf::SoundBuffer>::iterator iter = buffers.begin(); iter != buffers.end(); iter++) {
+		sounds[iter->first].setBuffer(iter->second);
+	}
 	// init current screen
 	screens[current]->init();
 }
@@ -37,4 +42,8 @@ Utils::Screen& Manager::getScreen(int pos) {
 
 sf::Font& Manager::getFont() {
 	return font;
+}
+
+void Manager::playSound(std::string name) {
+	sounds[name].play();
 }

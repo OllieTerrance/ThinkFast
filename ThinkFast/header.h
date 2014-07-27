@@ -1,11 +1,12 @@
 #include <iostream>
+#include <map>
 
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
 // constants and macros
-#define ERR_ASSET 2
+#define ERR_ASSET 1
 #define MAX_PLAYERS 8
 #define MOD(a, b) (((a) % (b)) + (b)) % (b)
 
@@ -39,8 +40,6 @@ namespace Utils {
                   sf::Color colour, sf::Color outlineColour, int style);
     void centreText(sf::Text& base, bool horiz, bool vert);
     void moveOutlineText(sf::Text& base, sf::Text* outlines, int shift);
-    // sound-related
-    void playSound(sf::SoundBuffer& buffer, sf::Sound& sound, std::string path);
 }
 
 // manager allows switching between screens
@@ -49,6 +48,8 @@ class Manager {
     int current;
     Utils::Screen* screens[3];
     sf::Font font;
+    std::map<std::string, sf::SoundBuffer> buffers;
+    std::map<std::string, sf::Sound> sounds;
 public:
     Manager(sf::RenderWindow& window);
     ~Manager();
@@ -57,13 +58,15 @@ public:
     Utils::Screen& getScreen();
     Utils::Screen& getScreen(int pos);
     sf::Font& getFont();
+    void playSound(std::string name);
 };
 
 // main menu screen
 class Menu : public Utils::Screen {
     Manager& manager;
     int selIndex;
-    int players;
+    sf::Texture bg;
+    sf::Clock clock;
 public:
     Menu(Manager& newManager);
     ~Menu();
@@ -77,6 +80,7 @@ public:
 class Controls : public Utils::Screen {
     Manager& manager;
     bool pressed[MAX_PLAYERS];
+    sf::Texture bg;
 public:
     Controls(Manager& newManager);
     ~Controls();
