@@ -26,14 +26,29 @@ void Menu::draw(sf::RenderWindow& window) {
     background.setTexture(bg);
     background.setTextureRect(sf::IntRect(offX - 32, offY - 32, 800 + offX, 600 + offY));
     window.draw(background);
+    // joystick connection status
+    int joysticks = 0;
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        sf::Text joy;
+        std::ostringstream joyStr;
+        joyStr << (i + 1);
+        Utils::makeText(joy, manager.getFont(), joyStr.str(), 16, (sf::Joystick::isConnected(i) ? sf::Color::Green : sf::Color(96, 96, 96)), sf::Text::Bold);
+        joy.setPosition(15 + (15 * i), 565);
+        window.draw(joy);
+        if (sf::Joystick::isConnected(i)) joysticks++;
+    }
     // main menu options
     sf::Text title;
     Utils::makeText(title, manager.getFont(), "Think Fast", 48, sf::Color::Cyan, sf::Text::Bold);
-    title.setPosition(0, 100);
+    title.setPosition(0, 120);
     Utils::centreText(title, true, false);
     window.draw(title);
     sf::Text opt1;
-    Utils::makeText(opt1, manager.getFont(), "Start", 28, (selIndex == 0 ? sf::Color::Cyan : sf::Color::White), 0);
+    std::ostringstream startStr;
+    startStr << "Start";
+    if (joysticks > 0) startStr << ": " << joysticks << "P";
+    sf::Color colour1 = (joysticks == 0 ? (selIndex == 0 ? sf::Color(0, 96, 96) : sf::Color(96, 96, 96)) : (selIndex == 0 ? sf::Color::Cyan : sf::Color::White));
+    Utils::makeText(opt1, manager.getFont(), startStr.str(), 28, colour1, 0);
     opt1.setPosition(0, 320);
     Utils::centreText(opt1, true, false);
     window.draw(opt1);
@@ -47,21 +62,16 @@ void Menu::draw(sf::RenderWindow& window) {
     opt3.setPosition(0, 420);
     Utils::centreText(opt3, true, false);
     window.draw(opt3);
-    // joystick connection status
-    for (int i = 0; i < MAX_PLAYERS; i++) {
-        sf::Text joy;
-        std::ostringstream joyStr;
-        joyStr << (i + 1);
-        Utils::makeText(joy, manager.getFont(), joyStr.str(), 16, (sf::Joystick::isConnected(i) ? sf::Color::Green : sf::Color(96, 96, 96)), 0);
-        joy.setPosition(15 + (15 * i), 565);
-        window.draw(joy);
-    }
 }
 
 void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
     if (!on) return;
     sf::SoundBuffer buffer;
     sf::Sound sound;
+    int joysticks = 0;
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (sf::Joystick::isConnected(i)) joysticks++;
+    }
     switch (key.code) {
         case sf::Keyboard::Key::Up:
             selIndex = MOD(selIndex - 1, 3);
@@ -74,8 +84,7 @@ void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
         case sf::Keyboard::Key::Return:
             switch (selIndex) {
                 case 0:
-                    manager.setCurrent(2);
-                    manager.playSound("beep1");
+                    if (joysticks > 0) manager.setCurrent(2);
                     break;
                 case 1:
                     manager.setCurrent(1);
