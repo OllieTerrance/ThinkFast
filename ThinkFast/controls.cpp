@@ -49,7 +49,7 @@ void Controls::keypress(sf::Event::KeyEvent& key, bool on) {
     switch (key.code) {
         case sf::Keyboard::Key::Escape:
             manager.setCurrent(0);
-            manager.playSound("beep1");
+            manager.playSound("menu1");
             break;
         default:
             break;

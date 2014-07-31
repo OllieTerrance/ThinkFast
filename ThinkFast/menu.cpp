@@ -75,11 +75,11 @@ void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
     switch (key.code) {
         case sf::Keyboard::Key::Up:
             selIndex = MOD(selIndex - 1, 3);
-            manager.playSound("beep2");
+            manager.playSound("menu2");
             break;
         case sf::Keyboard::Key::Down:
             selIndex = MOD(selIndex + 1, 3);
-            manager.playSound("beep2");
+            manager.playSound("menu2");
             break;
         case sf::Keyboard::Key::Return:
             switch (selIndex) {
@@ -88,7 +88,7 @@ void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
                     break;
                 case 1:
                     manager.setCurrent(1);
-                    manager.playSound("beep1");
+                    manager.playSound("menu1");
                     break;
                 case 2:
                     manager.getWindow().close();

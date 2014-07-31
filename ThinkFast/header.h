@@ -108,6 +108,9 @@ public:
     void keypress(sf::Event::KeyEvent& key, bool on);
     void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
     sf::Time getTime();
+    sf::Font& getFont();
+    void playSound(std::string name);
+    State getCurrent();
     void win();
     void lose();
 private:
@@ -125,7 +128,22 @@ namespace Games {
         PressButton(Play& newParent);
         ~PressButton();
         enum Button {Space, Enter, Up};
-        const std::string images[3] = {"space", "enter", "up"};
+        static const std::string images[3];
+        void draw(sf::RenderWindow& window);
+        void keypress(sf::Event::KeyEvent& key, bool on);
+        void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
+        std::string getPrompt();
+    };
+    class ButtonStack : public Utils::Game {
+        Play& parent;
+        int pos;
+        unsigned int stack[5];
+    public:
+        ButtonStack(Play& newParent);
+        ~ButtonStack();
+        static const std::string buttons[4];
+        static const sf::Color pendingColours[5];
+        static const sf::Color doneColours[5];
         void draw(sf::RenderWindow& window);
         void keypress(sf::Event::KeyEvent& key, bool on);
         void joybutton(sf::Event::JoystickButtonEvent& button, bool on);

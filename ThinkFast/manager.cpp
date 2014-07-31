@@ -10,7 +10,7 @@ Manager::Manager(sf::RenderWindow& newWindow) : window(newWindow) {
     current = 0;
     // load external resources
     if (!font.loadFromFile("fonts/Cantarell.ttf")) throw ERR_ASSET;
-    std::string soundNames[] = {"beep1", "beep2", "pluck1", "pluck2", "pluck3", "pluck4", "pluck5"};
+    std::string soundNames[] = {"menu1", "menu2", "beep", "buzz", "countdown", "win", "lose"};
     for (std::string name : soundNames) {
         std::ostringstream path;
         path << "sound/" << name << ".wav";

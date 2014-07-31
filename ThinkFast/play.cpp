@@ -16,7 +16,8 @@ void Play::init() {
     score = 0;
     countdown = 5;
     current = Countdown;
-    game = new Games::PressButton(*this);
+    game = new Games::ButtonStack(*this);
+    manager.playSound("countdown");
 }
 
 void Play::draw(sf::RenderWindow& window) {
@@ -24,14 +25,15 @@ void Play::draw(sf::RenderWindow& window) {
     if (countdown == 5 || (countdown > 0 && clock.getElapsedTime().asMilliseconds() >= 500)) {
         countdown--;
         clock.restart();
+        if (countdown > 0 && countdown < 4 && lives > 0) manager.playSound("countdown");
     }
     // print countdown or show game over
     if (countdown > 0) {
         if (lives > 0) {
             sf::Text countText;
             std::ostringstream countStr;
-            countStr << countdown << "...";
-            Utils::makeText(countText, manager.getFont(), countStr.str(), 32, sf::Color::Yellow, sf::Text::Bold);
+            countStr << countdown;
+            Utils::makeText(countText, manager.getFont(), countStr.str(), 40, sf::Color::Yellow, sf::Text::Bold);
             Utils::centreText(countText, true, true);
             window.draw(countText);
         } else {
@@ -82,11 +84,16 @@ void Play::draw(sf::RenderWindow& window) {
         window.draw(result);
     // reset for next game
     } else {
-        if (current == Win) score++;
-        if (current == Lose) lives--;
+        if (current == Win) {
+            score++;
+            manager.playSound("win");
+        } else if (current == Lose) {
+            lives--;
+            manager.playSound("lose");
+        }
         countdown = 5;
         current = Countdown;
-        game = new Games::PressButton(*this);
+        game = new Games::ButtonStack(*this);
         draw(window);
     }
     // always shown
@@ -134,6 +141,18 @@ void Play::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {
 
 sf::Time Play::getTime() {
     return clock.getElapsedTime();
+}
+
+sf::Font& Play::getFont() {
+    return manager.getFont();
+}
+
+void Play::playSound(std::string name) {
+    manager.playSound(name);
+}
+
+Play::State Play::getCurrent() {
+    return current;
 }
 
 void Play::win() {
