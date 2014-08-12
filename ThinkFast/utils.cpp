@@ -11,12 +11,14 @@ void Utils::Screen::init() {}
 void Utils::Screen::draw(sf::RenderWindow& window) {}
 void Utils::Screen::keypress(sf::Event::KeyEvent& key, bool on) {}
 void Utils::Screen::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {}
+void Utils::Screen::joyaxis(sf::Event::JoystickMoveEvent& move) {}
 
 Utils::Game::Game() {}
 Utils::Game::~Game() {}
 void Utils::Game::draw(sf::RenderWindow& window) {}
 void Utils::Game::keypress(sf::Event::KeyEvent& key, bool on) {}
 void Utils::Game::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {}
+void Utils::Game::joyaxis(sf::Event::JoystickMoveEvent& move) {}
 std::string Utils::Game::getPrompt() {
     return "";
 }

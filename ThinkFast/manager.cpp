@@ -10,13 +10,15 @@ Manager::Manager(sf::RenderWindow& newWindow) : window(newWindow) {
     current = 0;
     // load external resources
     if (!font.loadFromFile("fonts/Cantarell.ttf")) throw ERR_ASSET;
-    std::string soundNames[] = {"menu1", "menu2", "beep", "buzz", "countdown", "win", "lose"};
+    std::string soundNames[] = {"menu1", "menu2", "menu3", "beep", "buzz", "countdown", "win", "lose"};
     for (std::string name : soundNames) {
         std::ostringstream path;
         path << "sound/" << name << ".wav";
         if (!buffers[name].loadFromFile(path.str())) throw ERR_ASSET;
         sounds[name].setBuffer(buffers[name]);
     }
+    // set joystick status
+    for (int i = 0; i < sf::Joystick::Count; i++) joysticks[i] = sf::Joystick::isConnected(i);
     // init current screen
     screens[current]->init();
 }
@@ -29,6 +31,10 @@ Manager::~Manager() {
 
 sf::RenderWindow& Manager::getWindow() {
     return window;
+}
+
+bool* Manager::getJoysticks() {
+    return joysticks;
 }
 
 void Manager::setCurrent(int pos) {

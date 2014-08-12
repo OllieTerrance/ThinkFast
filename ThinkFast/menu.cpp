@@ -27,15 +27,16 @@ void Menu::draw(sf::RenderWindow& window) {
     background.setTextureRect(sf::IntRect(offX - 32, offY - 32, 800 + offX, 600 + offY));
     window.draw(background);
     // joystick connection status
-    int joysticks = 0;
-    for (int i = 0; i < MAX_PLAYERS; i++) {
+    bool* joysticks = manager.getJoysticks();
+    int joyCount = 0;
+    for (int i = 0; i < sf::Joystick::Count; i++) {
         sf::Text joy;
         std::ostringstream joyStr;
         joyStr << (i + 1);
-        Utils::makeText(joy, manager.getFont(), joyStr.str(), 16, (sf::Joystick::isConnected(i) ? sf::Color::Green : sf::Color(96, 96, 96)), sf::Text::Bold);
+        Utils::makeText(joy, manager.getFont(), joyStr.str(), 16, (joysticks[i] ? sf::Color::Green : sf::Color(96, 96, 96)), sf::Text::Bold);
         joy.setPosition(15 + (15 * i), 565);
         window.draw(joy);
-        if (sf::Joystick::isConnected(i)) joysticks++;
+        if (joysticks[i]) joyCount++;
     }
     // main menu options
     sf::Text title;
@@ -46,8 +47,8 @@ void Menu::draw(sf::RenderWindow& window) {
     sf::Text opt1;
     std::ostringstream startStr;
     startStr << "Start";
-    if (joysticks > 0) startStr << ": " << joysticks << "P";
-    sf::Color colour1 = (joysticks == 0 ? (selIndex == 0 ? sf::Color(0, 96, 96) : sf::Color(96, 96, 96)) : (selIndex == 0 ? sf::Color::Cyan : sf::Color::White));
+    if (joyCount > 0) startStr << ": " << joyCount << "P";
+    sf::Color colour1 = (joyCount == 0 ? (selIndex == 0 ? sf::Color(0, 96, 96) : sf::Color(96, 96, 96)) : (selIndex == 0 ? sf::Color::Cyan : sf::Color::White));
     Utils::makeText(opt1, manager.getFont(), startStr.str(), 28, colour1, 0);
     opt1.setPosition(0, 320);
     Utils::centreText(opt1, true, false);
@@ -68,9 +69,13 @@ void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
     if (!on) return;
     sf::SoundBuffer buffer;
     sf::Sound sound;
-    int joysticks = 0;
-    for (int i = 0; i < MAX_PLAYERS; i++) {
-        if (sf::Joystick::isConnected(i)) joysticks++;
+    bool* joysticks = manager.getJoysticks();
+    bool joys = false;
+    for (int i = 0; i < sf::Joystick::Count; i++) {
+        if (joysticks[i]) {
+            joys = true;
+            break;
+        }
     }
     switch (key.code) {
         case sf::Keyboard::Key::Up:
@@ -84,7 +89,8 @@ void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
         case sf::Keyboard::Key::Return:
             switch (selIndex) {
                 case 0:
-                    if (joysticks > 0) manager.setCurrent(2);
+                    if (joys) manager.setCurrent(2);
+                    else manager.playSound("menu3");
                     break;
                 case 1:
                     manager.setCurrent(1);
@@ -103,4 +109,35 @@ void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
     }
 }
 
-void Menu::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {}
+void Menu::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {
+    if (!on || button.button != 0) return;
+    sf::SoundBuffer buffer;
+    sf::Sound sound;
+    bool* joysticks = manager.getJoysticks();
+    bool joys = false;
+    for (int i = 0; i < sf::Joystick::Count; i++) {
+        if (joysticks[i]) {
+            joys = true;
+            break;
+        }
+    }
+    switch (selIndex) {
+        case 0:
+            if (joys) manager.setCurrent(2);
+            break;
+        case 1:
+            manager.setCurrent(1);
+            manager.playSound("menu1");
+            break;
+        case 2:
+            manager.getWindow().close();
+            break;
+    }
+}
+
+void Menu::joyaxis(sf::Event::JoystickMoveEvent& move) {
+    if (move.axis == sf::Joystick::Axis::PovY) {
+        if (move.position == 100) selIndex = MOD(selIndex + 1, 3);
+        else if (move.position == -100) selIndex = MOD(selIndex - 1, 3);
+    }
+}

@@ -7,7 +7,6 @@
 
 // constants and macros
 #define ERR_ASSET 1
-#define MAX_PLAYERS 8
 #define MOD(a, b) (((a) % (b)) + (b)) % (b)
 
 // general helper methods
@@ -21,9 +20,11 @@ namespace Utils {
         virtual void draw(sf::RenderWindow& window);
         virtual void keypress(sf::Event::KeyEvent& key, bool on);
         virtual void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
+        virtual void joyaxis(sf::Event::JoystickMoveEvent& move);
     };
     // game class abstracts individual mini-games
     class Game {
+        int players;
         enum State {InProgress, Win, Lose};
         State current;
     public:
@@ -32,6 +33,7 @@ namespace Utils {
         virtual void draw(sf::RenderWindow& window);
         virtual void keypress(sf::Event::KeyEvent& key, bool on);
         virtual void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
+        virtual void joyaxis(sf::Event::JoystickMoveEvent& move);
         virtual std::string getPrompt();
     };
     // text-related
@@ -45,6 +47,7 @@ namespace Utils {
 // manager allows switching between screens
 class Manager {
     sf::RenderWindow& window;
+    bool joysticks[sf::Joystick::Count];
     int current;
     Utils::Screen* screens[3];
     sf::Font font;
@@ -54,6 +57,7 @@ public:
     Manager(sf::RenderWindow& window);
     ~Manager();
     sf::RenderWindow& getWindow();
+    bool* getJoysticks();
     void setCurrent(int pos);
     Utils::Screen& getScreen();
     Utils::Screen& getScreen(int pos);
@@ -74,12 +78,13 @@ public:
     void draw(sf::RenderWindow& window);
     void keypress(sf::Event::KeyEvent& key, bool on);
     void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
+    void joyaxis(sf::Event::JoystickMoveEvent& move);
 };
 
 // control test screen
 class Controls : public Utils::Screen {
     Manager& manager;
-    bool pressed[MAX_PLAYERS];
+    bool pressed[sf::Joystick::Count];
     sf::Texture bg;
 public:
     Controls(Manager& newManager);
@@ -107,6 +112,7 @@ public:
     void draw(sf::RenderWindow& window);
     void keypress(sf::Event::KeyEvent& key, bool on);
     void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
+    void joyaxis(sf::Event::JoystickMoveEvent& move);
     sf::Time getTime();
     sf::Font& getFont();
     void playSound(std::string name);
@@ -118,22 +124,6 @@ private:
 };
 
 namespace Games {
-    class PressButton : public Utils::Game {
-        Play& parent;
-        sf::Texture bg;
-        int index;
-        int widths[3] = {110, 89, 56};
-        int heights[3] = {55, 43, 36};
-    public:
-        PressButton(Play& newParent);
-        ~PressButton();
-        enum Button {Space, Enter, Up};
-        static const std::string images[3];
-        void draw(sf::RenderWindow& window);
-        void keypress(sf::Event::KeyEvent& key, bool on);
-        void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
-        std::string getPrompt();
-    };
     class ButtonStack : public Utils::Game {
         Play& parent;
         int pos;
@@ -145,7 +135,6 @@ namespace Games {
         static const sf::Color pendingColours[5];
         static const sf::Color doneColours[5];
         void draw(sf::RenderWindow& window);
-        void keypress(sf::Event::KeyEvent& key, bool on);
         void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
         std::string getPrompt();
     };

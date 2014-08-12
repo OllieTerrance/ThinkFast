@@ -2,43 +2,6 @@
 
 #include <iostream>
 
-const std::string Games::PressButton::images[3] = {"space", "enter", "up"};
-
-Games::PressButton::PressButton(Play& newParent) : parent(newParent) {
-    index = rand() % 3;
-    if ((index == 0 && !bg.loadFromFile("images/PressButton/space.png"))
-        || (index == 1 && !bg.loadFromFile("images/PressButton/enter.png"))
-        || (index == 2 && !bg.loadFromFile("images/PressButton/up.png"))) throw ERR_ASSET;
-    bg.setRepeated(true);
-}
-
-Games::PressButton::~PressButton() {}
-
-void Games::PressButton::draw(sf::RenderWindow& window) {
-    sf::Sprite background;
-    background.setTexture(bg);
-    int time = parent.getTime().asMilliseconds();
-    int offX = MOD(time / 10, widths[index]);
-    int offY = MOD(time / 25, heights[index]);
-    background.setTextureRect(sf::IntRect(offX - widths[index], offY - heights[index], 800 + offX, 600 + offY));
-    window.draw(background);
-}
-
-void Games::PressButton::keypress(sf::Event::KeyEvent& key, bool on) {
-    if (!on) return;
-    Button selected = static_cast<Button>(index);
-    if ((key.code == sf::Keyboard::Key::Space && selected == Space)
-        || (key.code == sf::Keyboard::Key::Return && selected == Enter)
-        || (key.code == sf::Keyboard::Key::Up && selected == Up)) parent.win();
-    else parent.lose();
-}
-
-void Games::PressButton::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {}
-
-std::string Games::PressButton::getPrompt() {
-    return "Press the button!";
-}
-
 const std::string Games::ButtonStack::buttons[4] = {"A", "B", "X", "Y"};
 const sf::Color Games::ButtonStack::pendingColours[5] = {sf::Color(255, 96, 32), sf::Color(255, 80, 32), sf::Color(255, 64, 32), sf::Color(255, 48, 32), sf::Color(255, 32, 32)};
 const sf::Color Games::ButtonStack::doneColours[5] = {sf::Color(96, 255, 32), sf::Color(80, 255, 32), sf::Color(64, 255, 32), sf::Color(48, 255, 32), sf::Color(32, 255, 32)};
@@ -71,8 +34,6 @@ void Games::ButtonStack::draw(sf::RenderWindow& window) {
         window.draw(dark);
     }
 }
-
-void Games::ButtonStack::keypress(sf::Event::KeyEvent& key, bool on) {}
 
 void Games::ButtonStack::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {
     if (!on || button.button >= 4) return;

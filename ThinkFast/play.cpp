@@ -139,6 +139,11 @@ void Play::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {
     if (current == InProgress) game->joybutton(button, on);
 }
 
+void Play::joyaxis(sf::Event::JoystickMoveEvent& move) {
+    // pass input to game
+    if (current == InProgress) game->joyaxis(move);
+}
+
 sf::Time Play::getTime() {
     return clock.getElapsedTime();
 }
