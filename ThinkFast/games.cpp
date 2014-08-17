@@ -8,8 +8,7 @@ const sf::Color Games::ButtonStack::pendingColours[5] =
 const sf::Color Games::ButtonStack::doneColours[5] =
         {sf::Color(96, 255, 32), sf::Color(80, 255, 32), sf::Color(64, 255, 32), sf::Color(48, 255, 32), sf::Color(32, 255, 32)};
 
-Games::ButtonStack::ButtonStack(Play& newPlay, Manager& newManager) : play(newPlay), manager(newManager) {
-    pos = 0;
+Games::ButtonStack::ButtonStack(Play& newPlay, Manager& newManager) : play(newPlay), manager(newManager), pos{0} {
     for (int i = 0; i < 5; i++) {
         stack[i] = rand() % 4;
     }
@@ -18,33 +17,36 @@ Games::ButtonStack::ButtonStack(Play& newPlay, Manager& newManager) : play(newPl
 Games::ButtonStack::~ButtonStack() {}
 
 void Games::ButtonStack::draw(sf::RenderWindow& window) {
-    for (int i = 0; i < 5; i++) {
-        sf::RectangleShape stripe(sf::Vector2f(800, 120));
-        stripe.setPosition(0, 120 * i);
-        stripe.setFillColor(i >= pos ? pendingColours[i] : doneColours[i]);
-        window.draw(stripe);
-        sf::Text prompt;
-        Utils::makeText(prompt, manager.getFont(), buttons[stack[i]], 36, sf::Color::White, sf::Text::Bold);
-        prompt.setPosition(0, (120 * i) + 30);
-        Utils::centreText(prompt, true, false);
-        window.draw(prompt);
-    }
-    if (play.getCurrent() == Play::Lose) {
-        sf::RectangleShape dark(sf::Vector2f(800, 600));
-        dark.setPosition(0, 0);
-        dark.setFillColor(sf::Color(0, 0, 0, 128));
-        window.draw(dark);
+    for (int i = 0; i < manager.getPlayerCount(); i++) {
+        for (int j = 0; j < 5; j++) {
+            sf::RectangleShape stripe(sf::Vector2f(800 / manager.getPlayerCount(), 120));
+            stripe.setPosition(i * (800 / manager.getPlayerCount()), 120 * j);
+            stripe.setFillColor(j >= pos[i] ? pendingColours[j] : doneColours[j]);
+            window.draw(stripe);
+            sf::Text prompt;
+            Utils::makeText(prompt, manager.getFont(), buttons[stack[j]], 36, sf::Color::White, sf::Text::Bold);
+            prompt.setPosition(0, (120 * j) + 30);
+            Utils::centreText(prompt, true, false);
+            window.draw(prompt);
+        }
+        if (play.getCurrent(i) == Play::Lose) {
+            sf::RectangleShape dark(sf::Vector2f(800 / manager.getPlayerCount(), 600));
+            dark.setPosition(i * (800 / manager.getPlayerCount()), 0);
+            dark.setFillColor(sf::Color(0, 0, 0, 128));
+            window.draw(dark);
+        }
     }
 }
 
-void Games::ButtonStack::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {
-    if (!on || button.button >= 4) return;
-    if (button.button == stack[pos]) {
-        pos++;
-        if (pos == 5) play.win();
+void Games::ButtonStack::joybutton(sf::Event::JoystickButtonEvent& event, bool on) {
+    if (!on || event.button >= 4) return;
+    int player = manager.joyToPlayer(event.joystickId);
+    if (event.button == stack[pos[player]]) {
+        pos[player]++;
+        if (pos[player] == 5) play.win(player);
         manager.playSound("beep");
     } else {
-        play.lose();
+        play.lose(player);
         manager.playSound("buzz");
     }
 }

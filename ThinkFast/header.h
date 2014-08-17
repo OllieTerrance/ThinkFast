@@ -7,6 +7,7 @@
 
 // constants and macros
 #define ERR_ASSET 1
+#define ERR_JOY 2
 #define SCR_MENU 0
 #define SCR_CONTROLS 1
 #define SCR_PLAY 2
@@ -21,22 +22,20 @@ namespace Utils {
         virtual ~Screen();
         virtual void init();
         virtual void draw(sf::RenderWindow& window);
-        virtual void keypress(sf::Event::KeyEvent& key, bool on);
-        virtual void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
-        virtual void joyaxis(sf::Event::JoystickMoveEvent& move);
+        virtual void keypress(sf::Event::KeyEvent& event, bool on);
+        virtual void joybutton(sf::Event::JoystickButtonEvent& event, bool on);
+        virtual void joyaxis(sf::Event::JoystickMoveEvent& event);
     };
     // game class abstracts individual mini-games
     class Game {
         int players;
-        enum State {InProgress, Win, Lose};
-        State current;
     public:
         Game();
         virtual ~Game();
         virtual void draw(sf::RenderWindow& window);
-        virtual void keypress(sf::Event::KeyEvent& key, bool on);
-        virtual void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
-        virtual void joyaxis(sf::Event::JoystickMoveEvent& move);
+        virtual void keypress(sf::Event::KeyEvent& event, bool on);
+        virtual void joybutton(sf::Event::JoystickButtonEvent& event, bool on);
+        virtual void joyaxis(sf::Event::JoystickMoveEvent& event);
         virtual std::string getPrompt();
     };
     // text-related
@@ -64,6 +63,8 @@ public:
     sf::RenderWindow& getWindow();
     bool* getJoysticks();
     Manager& setPlayers(bool* joysticks);
+    int getPlayerCount();
+    int joyToPlayer(int joy);
     Manager& setCurrent(int pos);
     Utils::Screen& getScreen();
     Utils::Screen& getScreen(int pos);
@@ -82,9 +83,9 @@ public:
     ~Menu();
     void init();
     void draw(sf::RenderWindow& window);
-    void keypress(sf::Event::KeyEvent& key, bool on);
-    void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
-    void joyaxis(sf::Event::JoystickMoveEvent& move);
+    void keypress(sf::Event::KeyEvent& event, bool on);
+    void joybutton(sf::Event::JoystickButtonEvent& event, bool on);
+    void joyaxis(sf::Event::JoystickMoveEvent& event);
 };
 
 // control test screen
@@ -97,43 +98,44 @@ public:
     ~Controls();
     void init();
     void draw(sf::RenderWindow& window);
-    void keypress(sf::Event::KeyEvent& key, bool on);
-    void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
+    void keypress(sf::Event::KeyEvent& event, bool on);
+    void joybutton(sf::Event::JoystickButtonEvent& event, bool on);
 };
 
 // actual gameplay screen
 class Play : public Utils::Screen {
     Manager& manager;
-    int lives;
-    sf::Texture heart;
-    int score;
+    int lives[sf::Joystick::Count];
+    int score[sf::Joystick::Count];
+    bool counting;
     int countdown;
     sf::Clock clock;
     Utils::Game* game;
+    sf::Texture heart;
 public:
     Play(Manager& newManager);
     ~Play();
-    enum State {Countdown, InProgress, Win, Lose};
+    enum State {InProgress, Win, Lose};
     void init();
     void draw(sf::RenderWindow& window);
-    void keypress(sf::Event::KeyEvent& key, bool on);
-    void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
-    void joyaxis(sf::Event::JoystickMoveEvent& move);
+    void keypress(sf::Event::KeyEvent& event, bool on);
+    void joybutton(sf::Event::JoystickButtonEvent& event, bool on);
+    void joyaxis(sf::Event::JoystickMoveEvent& event);
     sf::Time getTime();
     sf::Font& getFont();
     void playSound(std::string name);
-    State getCurrent();
-    void win();
-    void lose();
+    State getCurrent(int player);
+    void win(int player);
+    void lose(int player);
 private:
-    State current;
+    State current[sf::Joystick::Count];
 };
 
 namespace Games {
     class ButtonStack : public Utils::Game {
         Play& play;
         Manager& manager;
-        int pos;
+        int pos[sf::Joystick::Count];
         unsigned int stack[5];
     public:
         ButtonStack(Play& newPlay, Manager& newManager);
@@ -142,7 +144,7 @@ namespace Games {
         static const sf::Color pendingColours[5];
         static const sf::Color doneColours[5];
         void draw(sf::RenderWindow& window);
-        void joybutton(sf::Event::JoystickButtonEvent& button, bool on);
+        void joybutton(sf::Event::JoystickButtonEvent& event, bool on);
         std::string getPrompt();
     };
 }

@@ -65,7 +65,7 @@ void Menu::draw(sf::RenderWindow& window) {
     window.draw(opt3);
 }
 
-void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
+void Menu::keypress(sf::Event::KeyEvent& event, bool on) {
     if (!on) return;
     sf::SoundBuffer buffer;
     sf::Sound sound;
@@ -77,7 +77,7 @@ void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
             break;
         }
     }
-    switch (key.code) {
+    switch (event.code) {
         case sf::Keyboard::Key::Up:
             selIndex = MOD(selIndex - 1, 3);
             manager.playSound("menu2");
@@ -109,8 +109,8 @@ void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
     }
 }
 
-void Menu::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {
-    if (!on || button.button != 0) return;
+void Menu::joybutton(sf::Event::JoystickButtonEvent& event, bool on) {
+    if (!on || event.button != 0) return;
     sf::SoundBuffer buffer;
     sf::Sound sound;
     bool* joysticks = manager.getJoysticks();
@@ -134,9 +134,14 @@ void Menu::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {
     }
 }
 
-void Menu::joyaxis(sf::Event::JoystickMoveEvent& move) {
-    if (move.axis == sf::Joystick::Axis::PovY) {
-        if (move.position == 100) selIndex = MOD(selIndex + 1, 3);
-        else if (move.position == -100) selIndex = MOD(selIndex - 1, 3);
+void Menu::joyaxis(sf::Event::JoystickMoveEvent& event) {
+    if (event.axis == sf::Joystick::Axis::PovY) {
+        if (event.position == 100) {
+            selIndex = MOD(selIndex + 1, 3);
+            manager.playSound("menu2");
+        } else if (event.position == -100) {
+            selIndex = MOD(selIndex - 1, 3);
+            manager.playSound("menu2");
+        }
     }
 }

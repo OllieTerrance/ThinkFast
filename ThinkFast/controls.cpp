@@ -43,9 +43,9 @@ void Controls::draw(sf::RenderWindow& window) {
     window.draw(backPrompt);
 }
 
-void Controls::keypress(sf::Event::KeyEvent& key, bool on) {
+void Controls::keypress(sf::Event::KeyEvent& event, bool on) {
     if (!on) return;
-    switch (key.code) {
+    switch (event.code) {
         case sf::Keyboard::Key::Escape:
             manager.setCurrent(SCR_MENU);
             manager.playSound("menu1");
@@ -55,6 +55,6 @@ void Controls::keypress(sf::Event::KeyEvent& key, bool on) {
     }
 }
 
-void Controls::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {
-    pressed[button.joystickId] = on;
+void Controls::joybutton(sf::Event::JoystickButtonEvent& event, bool on) {
+    pressed[event.joystickId] = on;
 }

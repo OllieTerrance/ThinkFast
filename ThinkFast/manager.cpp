@@ -50,6 +50,17 @@ Manager& Manager::setPlayers(bool* joysticks) {
     return *this;
 }
 
+int Manager::getPlayerCount() {
+    return playerCount;
+}
+
+int Manager::joyToPlayer(int joy) {
+    for (int i = 0; i < playerCount; i++) {
+        if (players[i] == joy) return i;
+    }
+    throw ERR_JOY;
+}
+
 Manager& Manager::setCurrent(int pos) {
     current = pos;
     screens[current]->init();
