@@ -47,7 +47,7 @@ void Controls::keypress(sf::Event::KeyEvent& key, bool on) {
     if (!on) return;
     switch (key.code) {
         case sf::Keyboard::Key::Escape:
-            manager.setCurrent(0);
+            manager.setCurrent(SCR_MENU);
             manager.playSound("menu1");
             break;
         default:

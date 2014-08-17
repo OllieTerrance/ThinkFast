@@ -89,12 +89,12 @@ void Menu::keypress(sf::Event::KeyEvent& key, bool on) {
         case sf::Keyboard::Key::Return:
             switch (selIndex) {
                 case 0:
-                    if (joys) manager.setCurrent(2);
-                    else manager.playSound("menu3");
+                    if (joys) {
+                        manager.setPlayers(joysticks).setCurrent(SCR_PLAY);
+                    } else manager.playSound("menu3");
                     break;
                 case 1:
-                    manager.setCurrent(1);
-                    manager.playSound("menu1");
+                    manager.setCurrent(SCR_CONTROLS).playSound("menu1");
                     break;
                 case 2:
                     manager.getWindow().close();
@@ -123,11 +123,10 @@ void Menu::joybutton(sf::Event::JoystickButtonEvent& button, bool on) {
     }
     switch (selIndex) {
         case 0:
-            if (joys) manager.setCurrent(2);
+            if (joys) manager.setCurrent(SCR_PLAY);
             break;
         case 1:
-            manager.setCurrent(1);
-            manager.playSound("menu1");
+            manager.setCurrent(SCR_CONTROLS).playSound("menu1");
             break;
         case 2:
             manager.getWindow().close();

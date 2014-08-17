@@ -4,10 +4,10 @@
 
 Manager::Manager(sf::RenderWindow& newWindow) : window(newWindow) {
     // create screens
-    screens[0] = new Menu(*this);
-    screens[1] = new Controls(*this);
-    screens[2] = new Play(*this);
-    current = 0;
+    screens[SCR_MENU] = new Menu(*this);
+    screens[SCR_CONTROLS] = new Controls(*this);
+    screens[SCR_PLAY] = new Play(*this);
+    current = SCR_MENU;
     // load external resources
     if (!font.loadFromFile("fonts/Cantarell.ttf")) throw ERR_ASSET;
     std::string soundNames[] = {"menu1", "menu2", "menu3", "beep", "buzz", "countdown", "win", "lose"};
@@ -37,9 +37,23 @@ bool* Manager::getJoysticks() {
     return joysticks;
 }
 
-void Manager::setCurrent(int pos) {
+Manager& Manager::setPlayers(bool* joysticks) {
+    int ptr = 0;
+    for (int i = 0; i < sf::Joystick::Count; i++) {
+        if (joysticks[i]) {
+            players[ptr] = i;
+            ptr++;
+        }
+    }
+    playerCount = ptr;
+    for (int i = ptr; i < sf::Joystick::Count; i++) players[i] = -1;
+    return *this;
+}
+
+Manager& Manager::setCurrent(int pos) {
     current = pos;
     screens[current]->init();
+    return *this;
 }
 
 Utils::Screen& Manager::getScreen() {
@@ -54,6 +68,7 @@ sf::Font& Manager::getFont() {
     return font;
 }
 
-void Manager::playSound(std::string name) {
+Manager& Manager::playSound(std::string name) {
     sounds[name].play();
+    return *this;
 }

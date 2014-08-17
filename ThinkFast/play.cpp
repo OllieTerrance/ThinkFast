@@ -16,7 +16,7 @@ void Play::init() {
     score = 0;
     countdown = 5;
     current = Countdown;
-    game = new Games::ButtonStack(*this);
+    game = new Games::ButtonStack(*this, manager);
     manager.playSound("countdown");
 }
 
@@ -44,7 +44,7 @@ void Play::draw(sf::RenderWindow& window) {
         }
     // game over, return to menu
     } else if (lives == 0) {
-        manager.setCurrent(0);
+        manager.setCurrent(SCR_MENU);
     // game in progress
     } else if (clock.getElapsedTime().asMilliseconds() < 2000) {
         if (current == Countdown) current = InProgress;
@@ -93,7 +93,7 @@ void Play::draw(sf::RenderWindow& window) {
         }
         countdown = 5;
         current = Countdown;
-        game = new Games::ButtonStack(*this);
+        game = new Games::ButtonStack(*this, manager);
         draw(window);
     }
     // always shown
@@ -117,7 +117,7 @@ void Play::draw(sf::RenderWindow& window) {
     sf::Text scoreOutlines[4];
     std::ostringstream scoreStr;
     scoreStr << score;
-    Utils::makeText(scoreText, scoreOutlines, manager.getFont(), scoreStr.str().c_str(), 28, sf::Color::White, sf::Color::Black, sf::Text::Bold);
+    Utils::makeText(scoreText, scoreOutlines, manager.getFont(), scoreStr.str(), 28, sf::Color::White, sf::Color::Black, sf::Text::Bold);
     sf::FloatRect scoreBounds = scoreText.getGlobalBounds();
     scoreText.setPosition(790 - scoreBounds.width, 5);
     Utils::moveOutlineText(scoreText, scoreOutlines, 6);
@@ -129,7 +129,7 @@ void Play::draw(sf::RenderWindow& window) {
 
 void Play::keypress(sf::Event::KeyEvent& key, bool on) {
     // return to menu
-    if (key.code == sf::Keyboard::Key::Escape && on) manager.setCurrent(0);
+    if (key.code == sf::Keyboard::Key::Escape && on) manager.setCurrent(SCR_MENU);
     // pass remaining input to game
     else if (current == InProgress) game->keypress(key, on);
 }
@@ -146,14 +146,6 @@ void Play::joyaxis(sf::Event::JoystickMoveEvent& move) {
 
 sf::Time Play::getTime() {
     return clock.getElapsedTime();
-}
-
-sf::Font& Play::getFont() {
-    return manager.getFont();
-}
-
-void Play::playSound(std::string name) {
-    manager.playSound(name);
 }
 
 Play::State Play::getCurrent() {

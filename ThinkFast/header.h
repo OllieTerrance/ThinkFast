@@ -7,6 +7,9 @@
 
 // constants and macros
 #define ERR_ASSET 1
+#define SCR_MENU 0
+#define SCR_CONTROLS 1
+#define SCR_PLAY 2
 #define MOD(a, b) (((a) % (b)) + (b)) % (b)
 
 // general helper methods
@@ -48,6 +51,8 @@ namespace Utils {
 class Manager {
     sf::RenderWindow& window;
     bool joysticks[sf::Joystick::Count];
+    int players[sf::Joystick::Count];
+    int playerCount;
     int current;
     Utils::Screen* screens[3];
     sf::Font font;
@@ -58,11 +63,12 @@ public:
     ~Manager();
     sf::RenderWindow& getWindow();
     bool* getJoysticks();
-    void setCurrent(int pos);
+    Manager& setPlayers(bool* joysticks);
+    Manager& setCurrent(int pos);
     Utils::Screen& getScreen();
     Utils::Screen& getScreen(int pos);
     sf::Font& getFont();
-    void playSound(std::string name);
+    Manager& playSound(std::string name);
 };
 
 // main menu screen
@@ -125,11 +131,12 @@ private:
 
 namespace Games {
     class ButtonStack : public Utils::Game {
-        Play& parent;
+        Play& play;
+        Manager& manager;
         int pos;
         unsigned int stack[5];
     public:
-        ButtonStack(Play& newParent);
+        ButtonStack(Play& newPlay, Manager& newManager);
         ~ButtonStack();
         static const std::string buttons[4];
         static const sf::Color pendingColours[5];
