@@ -11,7 +11,7 @@ all: $(SOURCES) $(OUT)
 $(OUT): $(OBJECTS)
 	mkdir -p bin && $(CC) $(OBJECTS) $(LIBS) -o $@
 
-.cpp.o:
+%.o: %.cpp header.h
 	$(CC) -c $< $(LIBS) -o $@
 
 run: all
