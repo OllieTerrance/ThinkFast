@@ -67,8 +67,6 @@ void Menu::draw(sf::RenderWindow& window) {
 
 void Menu::keypress(sf::Event::KeyEvent& event, bool on) {
     if (!on) return;
-    sf::SoundBuffer buffer;
-    sf::Sound sound;
     bool* joysticks = manager.getJoysticks();
     bool joys = false;
     for (int i = 0; i < sf::Joystick::Count; i++) {
@@ -89,9 +87,8 @@ void Menu::keypress(sf::Event::KeyEvent& event, bool on) {
         case sf::Keyboard::Key::Return:
             switch (selIndex) {
                 case 0:
-                    if (joys) {
-                        manager.setPlayers(joysticks).setCurrent(SCR_PLAY);
-                    } else manager.playSound("menu3");
+                    if (joys) manager.setPlayerJoysticks(joysticks).setCurrent(SCR_PLAY);
+                    else manager.playSound("menu3");
                     break;
                 case 1:
                     manager.setCurrent(SCR_CONTROLS).playSound("menu1");
@@ -111,8 +108,6 @@ void Menu::keypress(sf::Event::KeyEvent& event, bool on) {
 
 void Menu::joybutton(sf::Event::JoystickButtonEvent& event, bool on) {
     if (!on || event.button != 0) return;
-    sf::SoundBuffer buffer;
-    sf::Sound sound;
     bool* joysticks = manager.getJoysticks();
     bool joys = false;
     for (int i = 0; i < sf::Joystick::Count; i++) {
@@ -123,7 +118,8 @@ void Menu::joybutton(sf::Event::JoystickButtonEvent& event, bool on) {
     }
     switch (selIndex) {
         case 0:
-            if (joys) manager.setCurrent(SCR_PLAY);
+            if (joys) manager.setPlayerJoysticks(joysticks).setCurrent(SCR_PLAY);
+            else manager.playSound("menu3");
             break;
         case 1:
             manager.setCurrent(SCR_CONTROLS).playSound("menu1");

@@ -12,8 +12,10 @@ Play::Play(Manager& newManager) : manager(newManager) {
 Play::~Play() {}
 
 void Play::init() {
-    for (int i = 0; i < sf::Joystick::Count; i++) lives[i] = 3;
-    for (int i = 0; i < sf::Joystick::Count; i++) score[i] = 0;
+    for (int i = 0; i < manager.getPlayerCount(); i++) {
+        lives[i] = 3;
+        score[i] = 0;
+    }
     counting = true;
     countdown = 5;
     game = new Games::ButtonStack(*this, manager);
@@ -25,10 +27,42 @@ void Play::draw(sf::RenderWindow& window) {
     if (countdown == 5 || (countdown > 0 && clock.getElapsedTime().asMilliseconds() >= 500)) {
         countdown--;
         clock.restart();
-        if (countdown > 0 && countdown < 4 && lives[0] > 0) manager.playSound("countdown");
+        if (countdown > 0 && getActiveCount() > 0) manager.playSound("countdown");
     }
     // print countdown or show game over
     if (countdown > 0) {
+        // show scores on left
+        for (int i = 0; i < manager.getPlayerCount(); i++) {
+            int top = 310 - (20 * manager.getPlayerCount()) + (40 * i);
+            sf::Text playerText;
+            std::ostringstream playerStr;
+            playerStr << "Player " << (i + 1);
+            Utils::makeText(playerText, manager.getFont(), playerStr.str(), 20, sf::Color::White, 0);
+            playerText.setPosition(25, top + 5);
+            window.draw(playerText);
+            sf::Text scoreText;
+            std::ostringstream scoreStr;
+            scoreStr << score[i];
+            Utils::makeText(scoreText, manager.getFont(), scoreStr.str(), 32, sf::Color::White, 0);
+            scoreText.setPosition(112, top - 3);
+            window.draw(scoreText);
+            sf::Sprite hearts[3];
+            if (lives[i] >= 1) {
+                hearts[0].setTexture(heart);
+                hearts[0].setPosition(140, top);
+                window.draw(hearts[0]);
+                if (lives[i] >= 2) {
+                    hearts[1].setTexture(heart);
+                    hearts[1].setPosition(155, top);
+                    window.draw(hearts[1]);
+                    if (lives[i] >= 3) {
+                        hearts[2].setTexture(heart);
+                        hearts[2].setPosition(170, top);
+                        window.draw(hearts[2]);
+                    }
+                }
+            }
+        }
         if (lives[0] > 0) {
             sf::Text countText;
             std::ostringstream countStr;
@@ -43,13 +77,13 @@ void Play::draw(sf::RenderWindow& window) {
             window.draw(gameOver);
         }
     // game over, return to menu
-    } else if (lives[0] == 0) {
+    } else if (getActiveCount() == 0) {
         manager.setCurrent(SCR_MENU);
     // game in progress
     } else if (clock.getElapsedTime().asMilliseconds() < 2000) {
         if (counting) {
             counting = false;
-            for (int i = 0; i < sf::Joystick::Count; i++) current[i] = InProgress;
+            for (int i = 0; i < manager.getPlayerCount(); i++) state[i] = Progress;
         }
         // draw game-specific features
         game->draw(window);
@@ -73,63 +107,17 @@ void Play::draw(sf::RenderWindow& window) {
         progBar2.setFillColor(sf::Color(24, 24, 24));
         window.draw(progBar1);
         window.draw(progBar2);
-    // game finished
-    } else if (clock.getElapsedTime().asMilliseconds() < 3000) {
-        // if neither won nor lost, set to lose
-        for (int i = 0; i < sf::Joystick::Count; i++) {
-            if (current[i] == InProgress) current[i] = Lose;
-        }
-        window.clear(sf::Color::Black);
-        sf::Text result;
-        if (current[0] == Win) Utils::makeText(result, manager.getFont(), "Win!", 48, sf::Color::Green, sf::Text::Bold);
-        if (current[0] == Lose) Utils::makeText(result, manager.getFont(), "Lose!", 48, sf::Color::Red, sf::Text::Bold);
-        Utils::centreText(result, true, true);
-        window.draw(result);
-    // reset for next game
+    // game finished, reset for next game
     } else {
         for (int i = 0; i < manager.getPlayerCount(); i++) {
-            if (current[i] == Win) {
-                score[i]++;
-                manager.playSound("win");
-            } else {
-                lives[i]--;
-                manager.playSound("lose");
-            }
+            if (state[i] == Win) score[i]++;
+            else lives[i]--;
         }
         counting = true;
         countdown = 5;
         game = new Games::ButtonStack(*this, manager);
         draw(window);
     }
-    // always shown
-    sf::Sprite hearts[3];
-    if (lives[0] >= 1) {
-        hearts[0].setTexture(heart);
-        hearts[0].setPosition(2, 2);
-        window.draw(hearts[0]);
-        if (lives[0] >= 2) {
-            hearts[1].setTexture(heart);
-            hearts[1].setPosition(17, 2);
-            window.draw(hearts[1]);
-            if (lives[0] >= 3) {
-                hearts[2].setTexture(heart);
-                hearts[2].setPosition(32, 2);
-                window.draw(hearts[2]);
-            }
-        }
-    }
-    sf::Text scoreText;
-    sf::Text scoreOutlines[4];
-    std::ostringstream scoreStr;
-    scoreStr << score[0];
-    Utils::makeText(scoreText, scoreOutlines, manager.getFont(), scoreStr.str(), 28, sf::Color::White, sf::Color::Black, sf::Text::Bold);
-    sf::FloatRect scoreBounds = scoreText.getGlobalBounds();
-    scoreText.setPosition(790 - scoreBounds.width, 5);
-    Utils::moveOutlineText(scoreText, scoreOutlines, 6);
-    for (int i = 0; i < 4; i++) {
-        window.draw(scoreOutlines[i]);
-    }
-    window.draw(scoreText);
 }
 
 void Play::keypress(sf::Event::KeyEvent& event, bool on) {
@@ -142,27 +130,46 @@ void Play::keypress(sf::Event::KeyEvent& event, bool on) {
 void Play::joybutton(sf::Event::JoystickButtonEvent& event, bool on) {
     // pass input to game
     int player = manager.joyToPlayer(event.joystickId);
-    if (!counting && current[player] == InProgress) game->joybutton(event, on);
+    if (!counting && state[player] == Progress) game->joybutton(event, on);
 }
 
 void Play::joyaxis(sf::Event::JoystickMoveEvent& event) {
     // pass input to game
     int player = manager.joyToPlayer(event.joystickId);
-    if (!counting && current[player] == InProgress) game->joyaxis(event);
+    if (!counting && state[player] == Progress) game->joyaxis(event);
+}
+
+int Play::getActiveCount() {
+    int active = 0;
+    for (int i = 0; i < manager.getPlayerCount(); i++) {
+        if (lives[i] > 0) active++;
+    }
+    return active;
+}
+
+int Play::playerActive(int player) {
+    int active = 0;
+    for (int i = 0; i < manager.getPlayerCount(); i++) {
+        if (lives[i] > 0) {
+            if (i == player) return active;
+            else active++;
+        }
+    }
+    return -1;
 }
 
 sf::Time Play::getTime() {
     return clock.getElapsedTime();
 }
 
-Play::State Play::getCurrent(int player) {
-    return current[player];
+Play::State Play::getState(int player) {
+    return state[player];
 }
 
 void Play::win(int player) {
-    if (!counting && current[player] == InProgress) current[player] = Win;
+    if (!counting && state[player] == Progress) state[player] = Win;
 }
 
 void Play::lose(int player) {
-    if (!counting && current[player] == InProgress) current[player] = Lose;
+    if (!counting && state[player] == Progress) state[player] = Lose;
 }

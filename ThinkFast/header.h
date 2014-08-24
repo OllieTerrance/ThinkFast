@@ -62,7 +62,8 @@ public:
     ~Manager();
     sf::RenderWindow& getWindow();
     bool* getJoysticks();
-    Manager& setPlayers(bool* joysticks);
+    Manager& setPlayerJoysticks(bool* joysticks);
+    int* getPlayers();
     int getPlayerCount();
     int joyToPlayer(int joy);
     Manager& setCurrent(int pos);
@@ -115,20 +116,20 @@ class Play : public Utils::Screen {
 public:
     Play(Manager& newManager);
     ~Play();
-    enum State {InProgress, Win, Lose};
+    enum State {Progress, Win, Lose};
     void init();
     void draw(sf::RenderWindow& window);
     void keypress(sf::Event::KeyEvent& event, bool on);
     void joybutton(sf::Event::JoystickButtonEvent& event, bool on);
     void joyaxis(sf::Event::JoystickMoveEvent& event);
+    int getActiveCount();
+    int playerActive(int player);
     sf::Time getTime();
-    sf::Font& getFont();
-    void playSound(std::string name);
-    State getCurrent(int player);
+    State getState(int player);
     void win(int player);
     void lose(int player);
 private:
-    State current[sf::Joystick::Count];
+    State state[sf::Joystick::Count];
 };
 
 namespace Games {

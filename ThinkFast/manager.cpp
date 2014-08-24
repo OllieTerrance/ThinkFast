@@ -37,9 +37,10 @@ bool* Manager::getJoysticks() {
     return joysticks;
 }
 
-Manager& Manager::setPlayers(bool* joysticks) {
+Manager& Manager::setPlayerJoysticks(bool* newJoysticks) {
     int ptr = 0;
     for (int i = 0; i < sf::Joystick::Count; i++) {
+        joysticks[i] = newJoysticks[i];
         if (joysticks[i]) {
             players[ptr] = i;
             ptr++;
@@ -48,6 +49,10 @@ Manager& Manager::setPlayers(bool* joysticks) {
     playerCount = ptr;
     for (int i = ptr; i < sf::Joystick::Count; i++) players[i] = -1;
     return *this;
+}
+
+int* Manager::getPlayers() {
+    return players;
 }
 
 int Manager::getPlayerCount() {
